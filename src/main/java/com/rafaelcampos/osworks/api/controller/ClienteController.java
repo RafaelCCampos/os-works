@@ -3,6 +3,8 @@ package com.rafaelcampos.osworks.api.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rafaelcampos.osworks.domain.model.Cliente;
 import com.rafaelcampos.osworks.domain.repository.ClienteRepository;
+import com.rafaelcampos.osworks.domain.service.CadastroClienteService;
 
 @RestController
 @RequestMapping("/clientes")
@@ -25,6 +28,9 @@ public class ClienteController {
 
 	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private CadastroClienteService cadastroCliente;
 	
 	@GetMapping
 	public List<Cliente> listar() {
@@ -45,12 +51,12 @@ public class ClienteController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cliente adicionar(@RequestBody Cliente cliente) {
-		return clienteRepository.save(cliente);
+	public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
+		return cadastroCliente.salvar(cliente);
 	}
 	
 	@PutMapping("/{clienteId}")
-	public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId,
+	public ResponseEntity<Cliente> atualizar(@Valid @PathVariable Long clienteId,
 			@RequestBody Cliente cliente) {
 		
 		if (!clienteRepository.existsById(clienteId)) {
@@ -58,7 +64,7 @@ public class ClienteController {
 		}
 		
 		cliente.setId(clienteId);
-		cliente = clienteRepository.save(cliente);
+		cliente = cadastroCliente.salvar(cliente);
 		
 		return ResponseEntity.ok(cliente);
 	}
@@ -69,7 +75,7 @@ public class ClienteController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		clienteRepository.deleteById(clienteId);
+		cadastroCliente.excluir(clienteId);
 		
 		return ResponseEntity.noContent().build();
 	}

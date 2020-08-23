@@ -17,4 +17,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long>{
 	
 	//Usar o nome da variável da entidade.
 	List<Cliente> findByTelefone(String fone);
+	
+	Cliente findByEmail(String email);
 }
