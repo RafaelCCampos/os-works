@@ -2,6 +2,7 @@ package com.rafaelcampos.osworks.domain.model;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import com.rafaelcampos.osworks.domain.exception.NegocioException;
 
 @Entity
 public class OrdemServico {
@@ -24,15 +28,16 @@ public class OrdemServico {
 	private Cliente cliente;
 	
 	private String descricao;
-	
 	private BigDecimal preco;
 	
 	@Enumerated(EnumType.STRING) // O Padrão é tipo ordinal.
 	private StatusOrdemServico status;
 	
 	private OffsetDateTime dataAbertura;
-	
 	private OffsetDateTime dataFechamento;
+	
+	@OneToMany(mappedBy = "ordemServico")
+	private List<Comentario> comentarios;
 	
 	public Long getId() {
 		return id;
@@ -70,12 +75,20 @@ public class OrdemServico {
 	public void setDataAbertura(OffsetDateTime dataAbertura) {
 		this.dataAbertura = dataAbertura;
 	}
-	public OffsetDateTime getdataFechamento() {
+	
+	public OffsetDateTime getDataFechamento() {
 		return dataFechamento;
 	}
-	public void setdataFechamento(OffsetDateTime dataFechamento) {
+	public void setDataFechamento(OffsetDateTime dataFechamento) {
 		this.dataFechamento = dataFechamento;
 	}
+	public List<Comentario> getComentarios() {
+		return comentarios;
+	}
+	public void setComentarios(List<Comentario> comentarios) {
+		this.comentarios = comentarios;
+	}
+	
 	
 	@Override
 	public int hashCode() {
@@ -102,5 +115,30 @@ public class OrdemServico {
 		return true;
 	}
 	
+	public boolean podeSerFechada() {
+		return StatusOrdemServico.ABERTA.equals(getStatus());
+	}
+	
+	public void fechar(Long ordemServicoId) {
+		if(!podeSerFechada()) {
+			throw new NegocioException("Ordem de serviço não pode ser fechada.");
+		}
+		
+		setStatus(StatusOrdemServico.FECHADA);
+		setDataFechamento(OffsetDateTime.now());
+	}
+	
+	public boolean podeSerCancelada() {
+		return StatusOrdemServico.ABERTA.equals(getStatus());
+	}
+	
+	public void cancelar(Long ordemServicoId) {
+		if(!podeSerCancelada()) {
+			throw new NegocioException("Ordem de serviço não pode ser cancelada.");
+		}
+		
+		setStatus(StatusOrdemServico.CANCELADA);
+		setDataFechamento(OffsetDateTime.now());
+	}
 	
 }

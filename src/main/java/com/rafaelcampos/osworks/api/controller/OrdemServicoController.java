@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -61,6 +62,18 @@ public class OrdemServicoController {
 		}
 		
 		return ResponseEntity.notFound().build();
+	}
+	
+	@PutMapping("{ordemServicoId}/fechamento")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void fechar(@PathVariable Long ordemServicoId) {
+		gestaoOrdemServico.fechar(ordemServicoId);
+	}
+	
+	@PutMapping("{ordemServicoId}/cancelamento")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void cancelar(@PathVariable Long ordemServicoId) {
+		gestaoOrdemServico.cancelar(ordemServicoId);
 	}
 	
 	private OrdemServicoRepresentationModel toModel(OrdemServico ordemServico) {
